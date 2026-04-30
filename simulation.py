@@ -101,7 +101,7 @@ def calculer_puissance(angle_incidence: float, rendement: float,
     else:
         facteur_ombre = 1.0
 
-    return puissance_crete * rendement * facteur_cos * facteur_ombre
+    return puissance_crete * facteur_cos * facteur_ombre
 
 
 def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
