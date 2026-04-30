@@ -72,8 +72,8 @@ def angle_backtracking(hauteur_soleil: float, azimut_soleil: float,
         return angle_ideal
 
 
-def calculer_puissance(angle_incidence: float, rendement: float, 
-                       puissance_crete: float, pourcentage_ombre: float) -> float:
+def calculer_puissance(angle_incidence: float, puissance_crete: float, 
+                       pourcentage_ombre: float) -> float:
     """
     Calcule la puissance électrique produite par un panneau.
     
@@ -129,21 +129,21 @@ def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
             # 1. STRATÉGIE FIXE
             inc_f = angle_incidence(h_sol, az_sol, INCLINAISON_FIXE, AZIMUT_SUD)
             omb_f = longueur_ombre(h_sol, az_sol, INCLINAISON_FIXE, PANNEAU_HAUTEUR)
-            p_f = calculer_puissance(inc_f, PANNEAU_RENDEMENT, PANNEAU_PUISSANCE_CRETE,
+            p_f = calculer_puissance(inc_f, PANNEAU_PUISSANCE_CRETE,
                                      pourcentage_ombre(omb_f, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR))
 
             # 2. STRATÉGIE TRACKING NAÏF
             ang_t = angle_optimal_tracking(h_sol)
             inc_t = angle_incidence(h_sol, az_sol, ang_t, AZIMUT_SUD)
             omb_t = longueur_ombre(h_sol, az_sol, ang_t, PANNEAU_HAUTEUR)
-            p_t = calculer_puissance(inc_t, PANNEAU_RENDEMENT, PANNEAU_PUISSANCE_CRETE,
+            p_t = calculer_puissance(inc_t, PANNEAU_PUISSANCE_CRETE,
                                      pourcentage_ombre(omb_t, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR))
 
             # 3. STRATÉGIE BACKTRACKING
             ang_b = angle_backtracking(h_sol, az_sol, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR, AZIMUT_SUD)
             inc_b = angle_incidence(h_sol, az_sol, ang_b, AZIMUT_SUD)
             omb_b = longueur_ombre(h_sol, az_sol, ang_b, PANNEAU_HAUTEUR)
-            p_b = calculer_puissance(inc_b, PANNEAU_RENDEMENT, PANNEAU_PUISSANCE_CRETE,
+            p_b = calculer_puissance(inc_b, PANNEAU_PUISSANCE_CRETE,
                                      pourcentage_ombre(omb_b, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR))
 
             heures_float.append(temps_actuel.hour + temps_actuel.minute / 60)
