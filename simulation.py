@@ -19,13 +19,9 @@ TZ_LOCALE = pytz.timezone("Europe/Paris")
 
 def angle_optimal_tracking(hauteur_soleil: float) -> float:
     """
-    Calcule l'angle idéal pour un panneau perpendiculaire aux rayons du soleil.
-    
-    Args:
-        hauteur_soleil (float): Hauteur du soleil en degrés.
-
-    Returns:
-        float: Angle d'inclinaison du panneau (0° = horizontal, 90° = vertical).
+    Approximation 2D : valide uniquement quand le soleil est proche du méridien Sud.
+    Erreur maximale en début/fin de journée (azimut ≠ 180°).
+    Hypothèse acceptable dans le cadre d'un tracker 1 axe Est-Ouest.
     """
     # Si le soleil est à 30° de hauteur, le panneau doit être à 60° (90 - 30)
     # pour être face au soleil.
