@@ -81,7 +81,7 @@ def calcul_physique_complet(h_sol, az_sol, angle_panneau, espacement):
     omb = longueur_ombre(h_sol, az_sol, angle_panneau, PANNEAU_HAUTEUR)
     is_ombre = omb > espacement
     facteur_ombre = 0.0 if is_ombre else 1.0
-    p_out = p_max * cos_factor * facteur_ombre * PANNEAU_RENDEMENT
+    p_out = p_max * cos_factor * facteur_ombre 
     return p_out, inc, omb, is_ombre
 
 
