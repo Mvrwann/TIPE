@@ -12,6 +12,9 @@ import numpy as np
 import datetime
 from geometrie import position_soleil, angle_incidence, longueur_ombre, pourcentage_ombre
 from constantes import *
+import pytz
+
+TZ_LOCALE = pytz.timezone("Europe/Paris")
 
 
 def angle_optimal_tracking(hauteur_soleil: float) -> float:
@@ -119,8 +122,8 @@ def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
     res_fixe, res_track, res_back = [], [], []
 
     # Configuration temporelle (UTC pour éviter problèmes d'été/hiver local)
-    temps_actuel = datetime.datetime(date.year, date.month, date.day, 6, 0, tzinfo=datetime.timezone.utc)
-    temps_fin = datetime.datetime(date.year, date.month, date.day, 21, 0, tzinfo=datetime.timezone.utc)
+    temps_actuel = TZ_LOCALE.localize(datetime.datetime(date.year, date.month, date.day, 6, 0))
+    temps_actuel = temps_actuel.astimezone(datetime.timezone.utc)
     delta = datetime.timedelta(minutes=10)
 
     while temps_actuel < temps_fin:
