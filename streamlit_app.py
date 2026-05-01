@@ -213,8 +213,7 @@ with st.sidebar:
                 for ang in angles_test:
                     e = 0
                     for h in heures_opt:
-                        t = datetime.datetime.combine(DATE_SIMU, datetime.time(int(h), int((h % 1) * 60))).replace(
-                            tzinfo=datetime.timezone.utc)
+                        t = to_utc(DATE_SIMU, h)
                         hs, azs = position_soleil(LAT, LON, t)
                         if hs > 0 and longueur_ombre(hs, azs, ang, PANNEAU_HAUTEUR) <= ESPACEMENT:
                             e += np.cos(np.radians(angle_incidence(hs, azs, ang, AZIMUT_SUD)))
@@ -227,8 +226,7 @@ with st.sidebar:
                     e = 0
                     for d in dates_sample:
                         for h in heures_opt:
-                            t = datetime.datetime.combine(d, datetime.time(int(h), int((h % 1) * 60))).replace(
-                                tzinfo=datetime.timezone.utc)
+                            t = to_utc(d, h)
                             hs, azs = position_soleil(LAT, LON, t)
                             if hs > 0 and longueur_ombre(hs, azs, ang, PANNEAU_HAUTEUR) <= ESPACEMENT:
                                 e += np.cos(np.radians(angle_incidence(hs, azs, ang, AZIMUT_SUD)))
@@ -249,8 +247,7 @@ tab_dash, tab_eco, tab_map, tab_info = st.tabs(["Tableau de Bord", "Rentabilité
 
 with tab_dash:
     heure_simu = st.slider("Heure Solaire", 6.0, 20.0, 12.0, step=0.1)
-    t_utc = datetime.datetime.combine(DATE_SIMU, datetime.time(0, 0)) + datetime.timedelta(hours=heure_simu)
-    t_utc = t_utc.replace(tzinfo=datetime.timezone.utc)
+    t_utc = to_utc(DATE_SIMU, heure_simu)
     h_sol, az_sol = position_soleil(LAT, LON, t_utc)
 
     prix_instant = get_market_price(DATE_SIMU, heure_simu)
@@ -284,8 +281,7 @@ with tab_dash:
         ef, eb = 0, 0
         dt = (heures[1] - heures[0])
         for h in heures:
-            t = datetime.datetime.combine(DATE_SIMU, datetime.time(int(h), int((h % 1) * 60))).replace(
-                tzinfo=datetime.timezone.utc)
+            t = to_utc(DATE_SIMU, h)
             hs, azs = position_soleil(LAT, LON, t)
             if hs > 0:
                 vf, _, _, _ = calcul_physique_complet(hs, azs, FIXE_ANGLE, ESPACEMENT)
@@ -337,14 +333,13 @@ with tab_eco:
             rev_f_cumul, rev_b_cumul = 0, 0
             x_ax, y_f, y_b = [], [], []
 
-            start = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
+            start = datetime.date(2024, 1, 1)
 
             for d in days:
                 curr_d = start + datetime.timedelta(days=d)
                 day_f, day_b = 0, 0
                 for h in hours:
-                    t = datetime.datetime.combine(curr_d, datetime.time(int(h), int((h % 1) * 60))).replace(
-                        tzinfo=datetime.timezone.utc)
+                    t = to_utc(curr_d, h)
                     hs, azs = position_soleil(LAT, LON, t)
                     price = get_market_price(curr_d, h) / 1e6
 
@@ -403,13 +398,12 @@ with tab_map:
             hours = range(6, 20)
             z = []
 
-            start = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
+            start = datetime.date(2024, 1, 1)
 
             for h in hours:
                 row = []
                 for d in days:
-                    t = datetime.datetime.combine(start + datetime.timedelta(days=d), datetime.time(h, 0)).replace(
-                        tzinfo=datetime.timezone.utc)
+                    t = to_utc(start + datetime.timedelta(days=d), h)
                     hs, azs = position_soleil(LAT, LON, t)
 
                     if hs > 0:
