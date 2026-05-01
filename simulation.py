@@ -134,6 +134,7 @@ def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
             ombr_f = pourcentage_ombre(omb_f, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR, h_sol, INCLINAISON_FIXE)
             p_f = calculer_puissance(inc_f, PANNEAU_PUISSANCE_CRETE, ombr_f)
 
+
             # 2. STRATÉGIE TRACKING NAÏF
             ang_t = angle_optimal_tracking(h_sol)
             inc_t = angle_incidence(h_sol, az_sol, ang_t, AZIMUT_SUD)
