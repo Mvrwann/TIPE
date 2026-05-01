@@ -12,8 +12,9 @@ LONGITUDE = 5.3698
 # --- GÉOMÉTRIE DU PANNEAU (Unitaire) ---
 PANNEAU_HAUTEUR = 1.0       # Mètres (Longueur du côté incliné/Hypoténuse)
 PANNEAU_LARGEUR = 1.6       # Mètres (Largeur, donnée indicative)
-PANNEAU_RENDEMENT = 0.20    # 20% de conversion énergétique
 PANNEAU_PUISSANCE_CRETE = 300 # Watts-crête (Wc) : Puissance max STC
+PANNEAU_SURFACE = PANNEAU_HAUTEUR * PANNEAU_LARGEUR
+PANNEAU_RENDEMENT = PANNEAU_PUISSANCE_CRETE / (PANNEAU_SURFACE * 1000)
 
 # --- GÉOMÉTRIE DU CHAMP SOLAIRE ---
 ESPACEMENT_RANGEES = 2.5    # Mètres (Pitch : Distance pied-à-pied axe Nord-Sud)
