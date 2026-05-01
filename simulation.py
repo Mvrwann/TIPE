@@ -180,4 +180,4 @@ def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
 
 if __name__ == "__main__":
     # Test unitaire rapide
-    simuler_journee(datetime.datetime(2024, 6, 21), afficher_graphe=True)
+    simuler_journee(datetime.date(2024, 6, 21), afficher_graphe=True)
