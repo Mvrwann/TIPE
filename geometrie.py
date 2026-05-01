@@ -28,9 +28,10 @@ def position_soleil(latitude: float, longitude: float, date_heure: datetime.date
     """
     # Pysolar attend une timezone aware datetime
     if date_heure.tzinfo is None:
-        date_heure = date_heure.replace(tzinfo=datetime.timezone.utc)
-    altitude = get_altitude(latitude, longitude, date_heure)
-    azimut = get_azimuth(latitude, longitude, date_heure)
+        raise ValueError("date_heure doit être timezone-aware (UTC ou locale).")
+    date_heure_utc = date_heure.astimezone(datetime.timezone.utc)
+    altitude = get_altitude(latitude, longitude, date_heure_utc)
+    azimut = get_azimuth(latitude, longitude, date_heure_utc)
     return altitude, azimut
 
 
@@ -103,7 +104,8 @@ def longueur_ombre(hauteur_soleil: float, azimut_soleil: float,
     return hauteur_panneau * (term1 + term2)
 
 
-def pourcentage_ombre(longueur_ombre: float, espacement: float, hauteur_panneau: float) -> float:
+def pourcentage_ombre(longueur_ombre: float, espacement: float, hauteur_panneau: float,
+                      hauteur_soleil: float, inclinaison_panneau: float) -> float:
     """
     Calcule le pourcentage de la surface du panneau voisin qui est ombragé.
 
@@ -115,10 +117,15 @@ def pourcentage_ombre(longueur_ombre: float, espacement: float, hauteur_panneau:
     Returns:
         float: Ratio d'ombre entre 0.0 (pas d'ombre) et 1.0 (totalement ombré).
     """
-    if longueur_ombre <= espacement:
+    if longueur_ombre <= espacement or hauteur_soleil <= 0:
         return 0.0
 
     depassement = longueur_ombre - espacement
+    alpha_rad = np.radians(hauteur_soleil)
+    beta_rad = np.radians(inclinaison_panneau)
+
+    hauteur_ombre = depassement * np.tan(alpha_rad)
+    hauteur_panneau_proj = hauteur_panneau * np.sin(beta_rad)
     # On suppose que l'ombre monte linéairement sur le panneau suivant
-    ratio = depassement / hauteur_panneau
-    return min(1.0, ratio)
+    ratio = hauteur_ombre / hauteur_panneau_proj if hauteur_panneau_proj > 0 else 1.0
+    return min(1.0, max(0.0, ratio))
