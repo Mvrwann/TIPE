@@ -13,6 +13,7 @@ import datetime
 import pandas as pd
 import plotly.graph_objects as go
 from geometrie import pourcentage_ombre
+import pytz
 
 # --- CONFIGURATION GLOBALE ---
 st.set_page_config(layout="wide", page_title="SolarTrack : Analyse Industrielle")
