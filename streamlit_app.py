@@ -43,6 +43,13 @@ except ImportError:
 
 # --- CONSTANTES ---
 LAT, LON = 43.2965, 5.3698  # Marseille
+TZ_LOCALE = pytz.timezone("Europe/Paris")
+
+def to_utc(date_obj: datetime.date, hour_float: float) -> datetime.datetime:
+    local_dt = TZ_LOCALE.localize(
+        datetime.datetime.combine(date_obj, datetime.time(int(hour_float), int((hour_float % 1) * 60)))
+    )
+    return local_dt.astimezone(datetime.timezone.utc)
 
 # --- ETAT SESSION ---
 if 'angle_fixe_opti' not in st.session_state:
