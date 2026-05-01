@@ -118,8 +118,10 @@ def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
     res_fixe, res_track, res_back = [], [], []
 
     # Configuration temporelle (UTC pour éviter problèmes d'été/hiver local)
-    temps_actuel = TZ_LOCALE.localize(datetime.datetime(date.year, date.month, date.day, 6, 0))
-    temps_actuel = temps_actuel.astimezone(datetime.timezone.utc)
+    temps_debut_local = TZ_LOCALE.localize(datetime.datetime(date.year, date.month, date.day, 6, 0))
+    temps_fin_local = TZ_LOCALE.localize(datetime.datetime(date.year, date.month, date.day, 20, 0))
+    temps_actuel = temps_debut_local.astimezone(datetime.timezone.utc)
+    temps_fin = temps_fin_local.astimezone(datetime.timezone.utc)
     delta = datetime.timedelta(minutes=10)
 
     while temps_actuel < temps_fin:
@@ -128,23 +130,21 @@ def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
         if h_sol > 0:
             # 1. STRATÉGIE FIXE
             inc_f = angle_incidence(h_sol, az_sol, INCLINAISON_FIXE, AZIMUT_SUD)
-            omb_f = longueur_ombre(h_sol, az_sol, INCLINAISON_FIXE, PANNEAU_HAUTEUR)
-            p_f = calculer_puissance(inc_f, PANNEAU_PUISSANCE_CRETE,
-                                     pourcentage_ombre(omb_f, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR))
+            ombr_f = pourcentage_ombre(omb_f, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR, h_sol, INCLINAISON_FIXE)
+            p_f = calculer_puissance(inc_f, PANNEAU_PUISSANCE_CRETE, ombr_f)
+
 
             # 2. STRATÉGIE TRACKING NAÏF
             ang_t = angle_optimal_tracking(h_sol)
             inc_t = angle_incidence(h_sol, az_sol, ang_t, AZIMUT_SUD)
-            omb_t = longueur_ombre(h_sol, az_sol, ang_t, PANNEAU_HAUTEUR)
-            p_t = calculer_puissance(inc_t, PANNEAU_PUISSANCE_CRETE,
-                                     pourcentage_ombre(omb_t, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR))
+            ombr_t = pourcentage_ombre(omb_t, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR, h_sol, ang_t)
+            p_t = calculer_puissance(inc_t, PANNEAU_PUISSANCE_CRETE, ombr_t)
 
             # 3. STRATÉGIE BACKTRACKING
             ang_b = angle_backtracking(h_sol, az_sol, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR, AZIMUT_SUD)
             inc_b = angle_incidence(h_sol, az_sol, ang_b, AZIMUT_SUD)
-            omb_b = longueur_ombre(h_sol, az_sol, ang_b, PANNEAU_HAUTEUR)
-            p_b = calculer_puissance(inc_b, PANNEAU_PUISSANCE_CRETE,
-                                     pourcentage_ombre(omb_b, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR))
+            ombr_b = pourcentage_ombre(omb_b, ESPACEMENT_RANGEES, PANNEAU_HAUTEUR, h_sol, ang_b)
+            p_b = calculer_puissance(inc_b, PANNEAU_PUISSANCE_CRETE, ombr_b)
 
             heures_float.append(temps_actuel.hour + temps_actuel.minute / 60)
             res_fixe.append(p_f)
@@ -168,7 +168,9 @@ def simuler_journee(date: datetime.date, afficher_graphe: bool = True):
         plt.xlabel("Heure (UTC)")
         plt.ylabel("Puissance Unitaire (W)")
         plt.legend()
-        plt.title(f"Simulation du {date.date()}")
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        plt.title(f"Simulation du {date.isoformat()}"))
         plt.show()
 
     return e_fixe, e_track, e_back
