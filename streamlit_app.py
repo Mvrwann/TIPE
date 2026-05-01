@@ -12,6 +12,7 @@ import matplotlib.patches as patches
 import datetime
 import pandas as pd
 import plotly.graph_objects as go
+from geometrie import pourcentage_ombre
 
 # --- CONFIGURATION GLOBALE ---
 st.set_page_config(layout="wide", page_title="SolarTrack : Analyse Industrielle")
@@ -75,14 +76,11 @@ def get_market_price(date_obj: datetime.date, hour: float) -> float:
 # --- CALCUL PHYSIQUE (UNITAIRE) ---
 def calcul_physique_complet(h_sol, az_sol, angle_panneau, espacement):
     """Wrapper utilitaire pour calculer toutes les métriques d'un coup."""
-    p_max = PANNEAU_PUISSANCE_CRETE
     inc = angle_incidence(h_sol, az_sol, angle_panneau, AZIMUT_SUD)
-    cos_factor = np.cos(np.radians(inc)) if inc <= 90 else 0
     omb = longueur_ombre(h_sol, az_sol, angle_panneau, PANNEAU_HAUTEUR)
-    is_ombre = omb > espacement
-    facteur_ombre = 0.0 if is_ombre else 1.0
-    p_out = p_max * cos_factor * facteur_ombre 
-    return p_out, inc, omb, is_ombre
+    ombr = pourcentage_ombre(omb, espacement, PANNEAU_HAUTEUR, h_sol, angle_panneau)
+    p_out = calculer_puissance(inc, PANNEAU_PUISSANCE_CRETE, ombr)
+    return p_out, inc, omb, ombr > 0.05
 
 
 # --- VISUEL NOTATIONS (POUR ONGLET 4) ---
